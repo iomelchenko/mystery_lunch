@@ -16,10 +16,10 @@ ActiveRecord::Schema.define(version: 2020_09_04_093857) do
   enable_extension "plpgsql"
 
   create_table "allocations", force: :cascade do |t|
-    t.bigint "users_id"
-    t.bigint "meetings_id"
-    t.index ["meetings_id"], name: "index_allocations_on_meetings_id"
-    t.index ["users_id"], name: "index_allocations_on_users_id"
+    t.bigint "user_id"
+    t.bigint "meeting_id"
+    t.index ["meeting_id"], name: "index_allocations_on_meeting_id"
+    t.index ["user_id"], name: "index_allocations_on_user_id"
   end
 
   create_table "departments", force: :cascade do |t|
@@ -44,7 +44,7 @@ ActiveRecord::Schema.define(version: 2020_09_04_093857) do
     t.index ["department_id"], name: "index_users_on_department_id"
   end
 
-  add_foreign_key "allocations", "meetings", column: "meetings_id"
-  add_foreign_key "allocations", "users", column: "users_id"
+  add_foreign_key "allocations", "meetings"
+  add_foreign_key "allocations", "users"
   add_foreign_key "users", "departments"
 end
