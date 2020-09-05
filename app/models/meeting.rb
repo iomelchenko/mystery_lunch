@@ -15,4 +15,10 @@ class Meeting < ApplicationRecord
   has_many :users, through: :allocations
 
   validates_presence_of :year, :month
+
+  scope :current, -> { where('year = ? AND month = ?', Date.current.year, Date.current.month) }
+
+  scope :past, (lambda do
+    where('year = ? AND month < ? OR year < ?', Date.current.year, Date.current.month, Date.current.year)
+  end)
 end

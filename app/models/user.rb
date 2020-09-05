@@ -27,5 +27,7 @@ class User < ApplicationRecord
 
   enum state: { active: 0, inactive: 1 }
 
-  validates_presence_of :name, :state
+  validates_presence_of :name, :state, :department
+
+  scope :active, -> { where(state: :active) }
 end
