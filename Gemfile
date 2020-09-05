@@ -29,6 +29,7 @@ gem 'jbuilder', '~> 2.7'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'rubocop'
+gem 'will_paginate'
 
 group :development, :test do
   gem 'pry'

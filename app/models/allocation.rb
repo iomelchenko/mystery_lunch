@@ -25,12 +25,12 @@ class Allocation < ApplicationRecord
   scope :with_current_meetings, (lambda do
     joins(:meeting)
       .merge(Meeting.current)
-      .includes(user: :department)
+      .includes(:meeting, user: :department)
   end)
 
   scope :with_past_meetings, (lambda do
     joins(:meeting)
       .merge(Meeting.past)
-      .includes(user: :department)
+      .includes(:meeting, user: :department)
   end)
 end
