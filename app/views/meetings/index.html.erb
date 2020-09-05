@@ -1,0 +1,27 @@
+<%- model_class = Meeting -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+</div>
+
+</br>
+
+<table>
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:year) %></th>
+      <th><%= model_class.human_attribute_name(:month) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @meetings.each do |meeting| %>
+      <tr>
+        <td><%= meeting.id %></td>
+        <td><%= meeting.year %></td>
+        <td><%= meeting.month %></td>
+        <td><%= meeting.created_at %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
