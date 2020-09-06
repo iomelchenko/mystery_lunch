@@ -42,6 +42,6 @@ class User < ApplicationRecord
   scope :active, -> { where(state: :active) }
 
   def active?
-    state == :active
+    state == 'active'
   end
 end
