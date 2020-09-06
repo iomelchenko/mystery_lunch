@@ -6,7 +6,7 @@ class MeetingsDatatable
   attr_reader :collection
   delegate :params, to: :@view
 
-  def initialize(view, collection=Allocation.with_current_meetings)
+  def initialize(view, collection)
     @view = view
     @collection = collection
   end
