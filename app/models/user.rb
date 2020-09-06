@@ -4,12 +4,15 @@
 #
 # Table name: users
 #
-#  id            :bigint           not null, primary key
-#  name          :string           not null
-#  state         :integer          not null
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
-#  department_id :bigint
+#  id              :bigint           not null, primary key
+#  email           :string           not null
+#  name            :string           not null
+#  password_digest :string           not null
+#  role            :integer          default("user"), not null
+#  state           :integer          default("active"), not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  department_id   :bigint
 #
 # Indexes
 #
@@ -20,14 +23,29 @@
 #  fk_rails_...  (department_id => departments.id)
 #
 class User < ApplicationRecord
+  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
+
+  has_secure_password
+
   belongs_to :department
 
   has_many :allocations
   has_many :meetings, through: :allocations
 
   enum state: { active: 0, inactive: 1 }
+  enum role: { user: 0, admin: 1 }
 
-  validates_presence_of :name, :state, :department
+  validates_presence_of :name, :state, :department, :role
+  validates :email, presence: true, format: { with: VALID_EMAIL_REGEX }, uniqueness: { case_sensitive: false }
+  validates :password, presence: true, length: { minimum: 6 }, on: :create
 
   scope :active, -> { where(state: :active) }
+
+  def active?
+    state == 'active'
+  end
+
+  def admin?
+    role == 'admin'
+  end
 end

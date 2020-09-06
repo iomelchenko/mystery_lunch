@@ -23,12 +23,24 @@ Department.delete_all
   Department.create!(name: depatment_name)
 end
 
+User.create!(
+  name: 'ADMIN',
+  department: Department.find_by_name('HR'),
+  email: 'hr@example.com',
+  password: 'Test1234',
+  role: :admin
+)
+
 Department.pluck(:id).each do |department_id|
   1.upto(8).each do
+    password = Faker::Internet.password(min_length: 6)
+
     User.create!(
       name: Faker::Name.first_name + ' ' + Faker::Name.last_name,
       department_id: department_id,
-      state: :active
+      email: Faker::Internet.email,
+      password: password,
+      password_confirmation: password
     )
   end
 end

@@ -1,0 +1,46 @@
+<%= form_for @user, :html => { :class => "form-horizontal user" } do |f| %>
+  <%= render 'error_messages' %>
+
+  <div class="form-group">
+    <%= f.label :name, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :name, :class => 'form-control' %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :email, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :email, :class => 'form-control' %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :password, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :password, :class => 'form-control' %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :password_confirmation, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :password_confirmation, :class => 'form-control' %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :department, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.select :department_id, options_for_select(Department.all.map { |d| [d.name, d.id.to_i] }, @user.department_id), :class => 'form-control' %>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-lg-offset-2 col-lg-10">
+      <%= f.submit nil, data: { confirm: t('.confirm', default: t("helpers.links.confirm", default: 'Are you sure?')) }, :class => 'btn btn-info' %>
+      <%= link_to t('.cancel', default: t("helpers.links.cancel")),
+                users_path, class: 'btn btn-light' %>
+    </div>
+  </div>
+<% end %>
