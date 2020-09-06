@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
+  before_action :logged_in_user, :verify_role
+
   def index
     @users =
       User
@@ -56,6 +58,14 @@ class UsersController < ApplicationController
     end
 
     redirect_to @user
+  end
+
+  def verify_role
+    return if current_user.admin?
+
+    flash[:alert] = "You cannot access this resource"
+
+    redirect_to root_url
   end
 
   private

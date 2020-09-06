@@ -44,4 +44,8 @@ class User < ApplicationRecord
   def active?
     state == 'active'
   end
+
+  def admin?
+    role == 'admin'
+  end
 end
