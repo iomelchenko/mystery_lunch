@@ -6,7 +6,9 @@ class MeetingsController < ApplicationController
       if request.xhr?
         MeetingsSearcher.new(params, Allocation.all).call
       else
-        Allocation.with_current_meetings
+        Allocation
+          .with_current_meetings
+          .includes(:meeting, user: :department)
       end
 
     @data = MeetingsDatatable.new(view_context, collection).call
