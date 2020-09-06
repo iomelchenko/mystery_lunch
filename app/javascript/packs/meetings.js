@@ -1,12 +1,16 @@
 $(document).on('turbolinks:load', function() {
 	var groupColumn = 0;
+    var pastMeetings = 0;
 
-    $('#meetings-table').DataTable({
+    var $dTable = $('#meetings-table').DataTable({
         sPaginationType: "full_numbers",
         bJQueryUI: true,
         bProcessing: true,
         bServerSide: true,
         sAjaxSource: $('#meetings-table').data('source'),
+        fnServerParams: function ( aoData ) {
+            aoData.push( { "name": "pastMeetings", "value": pastMeetings } );
+        },
         columnDefs: [
             { visible: false, targets: groupColumn }
         ],
@@ -26,5 +30,16 @@ $(document).on('turbolinks:load', function() {
                 }
             } );
         }
+    });
+
+    $('input[type=radio][name=current]').change(function() {
+        if (this.value == 'current') {
+          pastMeetings = 0;
+        }
+        else if (this.value == 'past') {
+          pastMeetings = 1;
+        }
+
+        $dTable.ajax.reload();
     });
 } );

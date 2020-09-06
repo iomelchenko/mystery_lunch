@@ -2,7 +2,11 @@
   <h3> Mystery lunches </h3>
 </div>
 
-</br>
+<tr>
+  <td>Filter: </td>
+  <td><input name="current" type="radio" id="current" value="current" checked="checked">Current month</td>
+  <td><input name="current" type="radio" id="past" value="past">Past months</td>
+</tr>
 
 <table id="meetings-table" class="table table-bordered" data-source="<%= root_url(format: "json") %>">
   <thead>

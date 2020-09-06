@@ -2,11 +2,18 @@
 
 class MeetingsController < ApplicationController
   def index
-    @allocations = MeetingsDatatable.new(view_context).call
+    collection =
+      if request.xhr?
+        MeetingsSearcher.new(params, Allocation.all).call
+      else
+        Allocation.with_current_meetings
+      end
+
+    @data = MeetingsDatatable.new(view_context, collection).call
 
     respond_to do |format|
       format.html
-      format.json { render json: @allocations }
+      format.json { render json: @data }
     end
   end
 end

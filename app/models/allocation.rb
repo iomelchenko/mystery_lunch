@@ -23,14 +23,10 @@ class Allocation < ApplicationRecord
   belongs_to :user
 
   scope :with_current_meetings, (lambda do
-    joins(:meeting)
-      .merge(Meeting.current)
-      .includes(:meeting, user: :department)
+    joins(:meeting).merge(Meeting.current)
   end)
 
   scope :with_past_meetings, (lambda do
-    joins(:meeting)
-      .merge(Meeting.past)
-      .includes(:meeting, user: :department)
+    joins(:meeting).merge(Meeting.past)
   end)
 end
