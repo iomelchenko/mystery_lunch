@@ -6,10 +6,10 @@ class UsersController < ApplicationController
   def index
     @users =
       User
-        .all
-        .includes(:department)
-        .order(id: :desc)
-        .paginate(page: params[:page], per_page: 10)
+      .all
+      .includes(:department, avatar_attachment: :blob)
+      .order(id: :desc)
+      .paginate(page: params[:page], per_page: 10)
   end
 
   def show
@@ -28,8 +28,8 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
 
     if @user.save
-      flash[:success] = "User was successfully created." # Nice to tmplement it with i18n
-
+      # allocate new user to the existing pair
+      flash[:success] = 'User was successfully created.' # Nice to tmplement it with i18n
       redirect_to @user
     else
       render 'new'
@@ -40,7 +40,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
 
     if @user.update(user_params)
-      flash[:success] = "User was successfully updated."
+      flash[:success] = 'User was successfully updated.'
 
       redirect_to @user
     else
@@ -54,18 +54,10 @@ class UsersController < ApplicationController
     if @user.update(state: :inactive)
       # allocate remaining employee to the another pair
 
-      flash[:success] = "User was deactivated."
+      flash[:success] = 'User was deactivated.'
     end
 
     redirect_to @user
-  end
-
-  def verify_role
-    return if current_user.admin?
-
-    flash[:alert] = "You cannot access this resource"
-
-    redirect_to root_url
   end
 
   private
@@ -73,12 +65,20 @@ class UsersController < ApplicationController
   def user_params
     params
       .require(:user)
-      .permit(:name, :email, :password, :password_confirmation, :department_id, :role, :state)
+      .permit(:name, :email, :password, :password_confirmation, :department_id, :role, :state, :avatar)
       .then do |permitted|
-          permitted.delete(:password) unless permitted[:password].present?
-          permitted.delete(:password_confirmation) unless permitted[:password_confirm].present?
+        permitted.delete(:password) unless permitted[:password].present?
+        permitted.delete(:password_confirmation) unless permitted[:password_confirm].present?
 
-          permitted
+        permitted
       end
+  end
+
+  def verify_role
+    return if current_user.admin?
+
+    flash[:alert] = 'You cannot access this resource.'
+
+    redirect_to root_url
   end
 end

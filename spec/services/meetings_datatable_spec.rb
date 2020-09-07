@@ -22,6 +22,12 @@ describe MeetingsDatatable do
   let(:view_object) { OpenStruct.new(params: { sEcho: 1 }) }
   let(:current_allocations) { Allocation.with_current_meetings }
 
+  let(:avatar_url) { 'http://www.gravatar.com' }
+
+  before do
+    allow_any_instance_of(described_class).to receive(:get_avatar_url).and_return(avatar_url)
+  end
+
   it 'returns valid json object for datatable' do
     datatable_json = described_class.new(view_object, current_allocations).call
     data = datatable_json[:aaData]
@@ -31,19 +37,19 @@ describe MeetingsDatatable do
     expect(datatable_json[:iTotalDisplayRecords]).to eql(Allocation.count)
 
     expect(data).to include(
-      ["Mystery pair #{meeting1.id}", "#{Date.current.month}/#{Date.current.year}", user1.name, user1.department.name]
+      ["Mystery pair #{meeting1.id}", "#{Date.current.month}/#{Date.current.year}", user1.name, user1.department.name, avatar_url]
     )
 
     expect(data).to include(
-      ["Mystery pair #{meeting1.id}", "#{Date.current.month}/#{Date.current.year}", user2.name, user2.department.name]
+      ["Mystery pair #{meeting1.id}", "#{Date.current.month}/#{Date.current.year}", user2.name, user2.department.name, avatar_url]
     )
 
     expect(data).to include(
-      ["Mystery pair #{meeting2.id}", "#{Date.current.month}/#{Date.current.year}", user3.name, user3.department.name]
+      ["Mystery pair #{meeting2.id}", "#{Date.current.month}/#{Date.current.year}", user3.name, user3.department.name, avatar_url]
     )
 
     expect(data).to include(
-      ["Mystery pair #{meeting2.id}", "#{Date.current.month}/#{Date.current.year}", user4.name, user4.department.name]
+      ["Mystery pair #{meeting2.id}", "#{Date.current.month}/#{Date.current.year}", user4.name, user4.department.name, avatar_url]
     )
   end
 end

@@ -11,6 +11,7 @@ class MeetingsSearcher
   def call
     allocations.then { |alloc| params[:sSearch].present? ? filter(alloc) : alloc }
       .includes(:meeting, user: :department)
+      .includes(user: { avatar_attachment: :blob })
       .order(id: :desc)
       .page(page)
       .per_page(per_page)

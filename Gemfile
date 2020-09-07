@@ -30,6 +30,7 @@ gem 'bcrypt'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
 
+gem "mini_magick"
 gem 'rubocop'
 gem 'will_paginate'
 
