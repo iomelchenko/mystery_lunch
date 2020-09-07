@@ -65,7 +65,7 @@ class UsersController < ApplicationController
   def user_params
     params
       .require(:user)
-      .permit(:name, :email, :password, :password_confirmation, :department_id, :role, :state)
+      .permit(:name, :email, :password, :password_confirmation, :department_id, :role, :state, :avatar)
       .then do |permitted|
         permitted.delete(:password) unless permitted[:password].present?
         permitted.delete(:password_confirmation) unless permitted[:password_confirm].present?
