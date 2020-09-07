@@ -12,7 +12,8 @@ $(document).on('turbolinks:load', function() {
             aoData.push( { "name": "pastMeetings", "value": pastMeetings } );
         },
         columnDefs: [
-            { visible: false, targets: groupColumn }
+            { visible: false, targets: groupColumn },
+            { targets: 4, data: "img", render: function (url, type, full) { return '<img height="100%" width="50%" src="'+full[4]+'"/>'; } }
         ],
         order: [[ groupColumn, 'asc' ]],
         drawCallback: function ( settings ) {

@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-include ERB::Util
-
 class MeetingsDatatable
+  include ERB::Util
+  include Rails.application.routes.url_helpers
+
   attr_reader :collection
   delegate :params, to: :@view
 
@@ -32,7 +33,8 @@ class MeetingsDatatable
         html_escape(meeting_name(row.meeting.id)),
         html_escape(meeting_month(row.meeting.year, row.meeting.month)),
         html_escape(row.user.name),
-        html_escape(row.user.department.name)
+        html_escape(row.user.department.name),
+        html_escape(get_avatar_url(row.user))
       ]
     end
   end
@@ -47,5 +49,15 @@ class MeetingsDatatable
 
   def collection_count
     @collection_count ||= collection.count
+  end
+
+  def get_avatar_url(user)
+    return gravatar(user) unless user.avatar.present?
+
+    polymorphic_path(user.avatar.variant(resize: "75x75"))
+  end
+
+  def gravatar(user)
+    "#{::User::GRAVATAR_URL}?gravatar_id=#{Digest::MD5::hexdigest(user.email)}?d=wavatar"
   end
 end

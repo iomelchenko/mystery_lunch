@@ -7,7 +7,7 @@ class UsersController < ApplicationController
     @users =
       User
       .all
-      .includes(:department)
+      .includes(:department, avatar_attachment: :blob)
       .order(id: :desc)
       .paginate(page: params[:page], per_page: 10)
   end

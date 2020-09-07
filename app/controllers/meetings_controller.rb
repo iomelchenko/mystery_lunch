@@ -9,6 +9,7 @@ class MeetingsController < ApplicationController
         Allocation
           .with_current_meetings
           .includes(:meeting, user: :department)
+          .includes(user: { avatar_attachment: :blob })
       end
 
     @data = MeetingsDatatable.new(view_context, collection).call
