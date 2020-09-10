@@ -11,6 +11,8 @@
 #  updated_at :datetime         not null
 #
 class Meeting < ApplicationRecord
+  FORBIDDEN_PAIRS_PERIOD_IN_MONTHS = 3
+
   has_many :allocations
   has_many :users, through: :allocations
 
