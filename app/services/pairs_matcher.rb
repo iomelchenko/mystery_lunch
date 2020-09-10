@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PairsMatcher
-  attr_reader :users_for_allocation, :month, :year
+  attr_reader :users_for_allocation, :month, :year, :odd_user_obj
 
   def initialize(params={})
     @month = params[:month] || Date.current.month
@@ -11,7 +11,10 @@ class PairsMatcher
   def allocate
     delete_meetings
     build_users_for_allocation
+
+    take_odd_user
     process_allocation
+    allocate_odd_user
   end
 
   private
@@ -21,7 +24,6 @@ class PairsMatcher
       user_id, user_obj = min_by_allowed
 
       break if user_id.nil?
-      break if user_obj[:allowed].empty? # Latest odd user!!!!!!!!!!!!!!!!
 
       matched_user_id = take_match(user_obj)
 
@@ -30,6 +32,13 @@ class PairsMatcher
       create_meeting(meeting_params)
       remove_from_available(meeting_params)
     end
+  end
+
+  def take_odd_user
+    return unless users_for_allocation.count.odd?
+
+    @odd_user_obj = min_by_allowed
+    remove_from_available(user_id: @odd_user_obj[0])
   end
 
   def build_users_for_allocation
@@ -116,5 +125,31 @@ class PairsMatcher
       CROSS JOIN users AS u2
       WHERE u1.id != u2.id
         AND u1.department_id != u2.department_id;"
+  end
+
+  def allocate_odd_user
+    return unless @odd_user_obj
+
+    odd_user_id = @odd_user_obj[0]
+    allowed_ids = @odd_user_obj[1][:allowed]
+
+    allowed_ids.each do |allowed_id|
+      meeting =
+        Meeting
+          .where(year: year, month: month)
+          .joins(:allocations)
+          .where('allocations.user_id = ?', allowed_id)
+          .first
+
+      next unless Allocation.where(meeting_id: meeting.id, user_id: (allowed_ids - [allowed_id])).any?
+
+      join_existing_meeting(odd_user_id, meeting.id)
+
+      break
+    end
+  end
+
+  def join_existing_meeting(user_id, meeting_id)
+    Allocation.create!(meeting_id: meeting_id, user_id: user_id)
   end
 end
