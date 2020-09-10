@@ -6,12 +6,15 @@ namespace :initialise do
     current_date = Date.current.end_of_day
 
     until date > current_date do
+      start_time = Time.now
+
       year = date.year
       month = date.month
 
       PairsMatcher.new(year: year, month: month).allocate
 
       puts "Created the meetings for #{month}/#{year}"
+      puts "Duration - #{Time.now - start_time} sec."
 
       date += 1.month
     end
