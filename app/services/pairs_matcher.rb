@@ -1,18 +1,27 @@
 # frozen_string_literal: true
 
 class PairsMatcher
-  attr_reader :users_for_allocation, :not_allowed_for_allocation, :month, :year, :odd_user_obj
+  attr_reader :allowed_allocations_builder,
+              :not_allowed_for_allocation,
+              :month,
+              :year,
+              :odd_user_obj
 
-  def initialize(params={})
-    @month = params[:month] || Date.current.month
-    @year = params[:year] || Date.current.year
+  def initialize(
+        month: Date.current.month,
+        year: Date.current.year,
+        allowed_allocations_builder: AllowedAllocationsBuilder
+      )
+
+    @month = month
+    @year = year
+    @allowed_allocations_builder = allowed_allocations_builder.new
   end
 
   def allocate
     delete_meetings
-    pair_cases, all_candidates = select_all_candidates
-    build_not_allowed_for_allocation(all_candidates)
-    build_users_for_allocation(all_candidates, pair_cases)
+    build_users_for_allocation
+    build_not_allowed_for_allocation
 
     take_odd_user
     process_allocation
@@ -33,47 +42,26 @@ class PairsMatcher
 
       meeting_params = buid_meeting_params(user_id, matched_user_id)
       create_meeting(meeting_params)
-      remove_from_available(meeting_params)
+      allowed_allocations_builder.remove_from_available(meeting_params)
     end
   end
 
   def take_odd_user
-    return unless users_for_allocation.count.odd?
+    return unless allowed_allocations_builder.users_for_allocation.count.odd?
 
     @odd_user_obj = min_by_allowed
-    remove_from_available(user_id: @odd_user_obj[0])
+    allowed_allocations_builder.remove_from_available(user_id: @odd_user_obj[0])
   end
 
-  def select_all_candidates
-    cross_users = ActiveRecord::Base.connection.execute(cross_users_statement).to_a
-
-    pair_cases = cross_users.map { |row| [row['first_el'], row['second_el']].sort }.uniq
-    [pair_cases, pair_cases.flatten.uniq]
-  end
-
-  def build_users_for_allocation(all_candidates, pair_cases)
-    @users_for_allocation =
-      all_candidates.each_with_object({}) do |user_id, hsh|
-        matches = Array.new
-
-        pair_cases.each do |pair|
-          if user_id == pair[0]
-            matches << pair[1].to_s
-          elsif user_id == pair[1]
-            matches << pair[0].to_s
-          end
-        end
-
-        matches.uniq!
-        hsh["#{user_id}"] = { allowed: matches, count: matches.count }
-      end
+  def build_users_for_allocation
+    allowed_allocations_builder.call
   end
 
   def min_by_allowed(ids=nil)
     if ids
-      users_for_allocation.select { |k, _v| ids.include?(k) }
+      allowed_allocations_builder.users_for_allocation.select { |k, _v| ids.include?(k) }
     else
-      users_for_allocation
+      allowed_allocations_builder.users_for_allocation
     end.min_by { |_k, v| v[:count] }
   end
 
@@ -103,34 +91,11 @@ class PairsMatcher
     end
   end
 
-  def remove_from_available(meeting_params)
-    user_id = meeting_params[:user_id]
-    matched_user_id = meeting_params[:matched_user_id]
-
-    users_for_allocation.delete(user_id)
-    users_for_allocation.delete(matched_user_id)
-
-    users_for_allocation.each do |k, v|
-      v[:allowed].delete(user_id)
-      v[:allowed].delete(matched_user_id)
-
-      v[:count] = v[:allowed].count
-    end
-  end
-
   def buid_meeting_params(user_id, matched_user_id)
     {
       user_id: user_id,
       matched_user_id: matched_user_id
     }
-  end
-
-  def cross_users_statement
-    "SELECT u1.id AS first_el, u2.id AS second_el
-       FROM users AS u1
-      CROSS JOIN users AS u2
-      WHERE u1.id != u2.id
-        AND u1.department_id != u2.department_id;"
   end
 
   def allocate_odd_user
@@ -159,7 +124,7 @@ class PairsMatcher
     Allocation.create!(meeting_id: meeting_id, user_id: user_id)
   end
 
-  def build_not_allowed_for_allocation(all_candidates)
+  def build_not_allowed_for_allocation
     first_date = ::Meeting::FORBIDDEN_PAIRS_PERIOD_IN_MONTHS.month.ago.at_beginning_of_month
     last_date = Date.new(year, month, 1).at_end_of_month
 
@@ -175,19 +140,21 @@ class PairsMatcher
     pair_cases = cross_users.map { |row| [row['first_el'], row['second_el']].sort }.uniq
 
     @not_allowed_for_allocation =
-      all_candidates.each_with_object({}) do |user_id, hsh|
-        matches = Array.new
+      allowed_allocations_builder
+        .all_candidates
+        .each_with_object({}) do |user_id, hsh|
+          matches = Array.new
 
-        pair_cases.each do |pair|
-          if user_id == pair[0]
-            matches << pair[1].to_s
-          elsif user_id == pair[1]
-            matches << pair[0].to_s
+          pair_cases.each do |pair|
+            if user_id == pair[0]
+              matches << pair[1].to_s
+            elsif user_id == pair[1]
+              matches << pair[0].to_s
+            end
           end
-        end
 
-        matches.uniq!
-        hsh["#{user_id}"] = matches
+          matches.uniq!
+          hsh["#{user_id}"] = matches
       end
   end
 
