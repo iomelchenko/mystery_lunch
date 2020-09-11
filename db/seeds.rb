@@ -23,6 +23,8 @@ Department.delete_all
   Department.create!(name: depatment_name)
 end
 
+puts "-----> Generated #{Department.count} departments."
+
 User.create!(
   name: 'ADMIN',
   department: Department.find_by_name('HR'),
@@ -44,5 +46,7 @@ Department.pluck(:id).each do |department_id|
     )
   end
 end
+
+puts "-----> Generated #{User.count} users."
 
 Rake::Task['initialise:meetings_seeds'].invoke

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PairsMatcher
-  attr_reader :users_for_allocation, :month, :year, :odd_user_obj
+  attr_reader :users_for_allocation, :not_allowed_for_allocation, :month, :year, :odd_user_obj
 
   def initialize(params={})
     @month = params[:month] || Date.current.month
@@ -10,7 +10,9 @@ class PairsMatcher
 
   def allocate
     delete_meetings
-    build_users_for_allocation
+    pair_cases, all_candidates = select_all_candidates
+    build_not_allowed_for_allocation(all_candidates)
+    build_users_for_allocation(all_candidates, pair_cases)
 
     take_odd_user
     process_allocation
@@ -25,10 +27,11 @@ class PairsMatcher
 
       break if user_id.nil?
 
-      matched_user_id = take_match(user_obj)
+      matched_user_id = take_match(user_id, user_obj)
+
+      break unless matched_user_id
 
       meeting_params = buid_meeting_params(user_id, matched_user_id)
-
       create_meeting(meeting_params)
       remove_from_available(meeting_params)
     end
@@ -41,12 +44,14 @@ class PairsMatcher
     remove_from_available(user_id: @odd_user_obj[0])
   end
 
-  def build_users_for_allocation
+  def select_all_candidates
     cross_users = ActiveRecord::Base.connection.execute(cross_users_statement).to_a
 
     pair_cases = cross_users.map { |row| [row['first_el'], row['second_el']].sort }.uniq
-    all_candidates = pair_cases.flatten.uniq
+    [pair_cases, pair_cases.flatten.uniq]
+  end
 
+  def build_users_for_allocation(all_candidates, pair_cases)
     @users_for_allocation =
       all_candidates.each_with_object({}) do |user_id, hsh|
         matches = Array.new
@@ -72,8 +77,9 @@ class PairsMatcher
     end.min_by { |_k, v| v[:count] }
   end
 
-  def take_match(user_obj)
-    min_by_allowed(user_obj[:allowed])[0]
+  def take_match(user_id, user_obj)
+    not_allowed = not_allowed_for_allocation[user_id]
+    min_by_allowed(user_obj[:allowed] - not_allowed)&.first
   end
 
   def delete_meetings
@@ -151,5 +157,48 @@ class PairsMatcher
 
   def join_existing_meeting(user_id, meeting_id)
     Allocation.create!(meeting_id: meeting_id, user_id: user_id)
+  end
+
+  def build_not_allowed_for_allocation(all_candidates)
+    first_date = ::Meeting::FORBIDDEN_PAIRS_PERIOD_IN_MONTHS.month.ago.at_beginning_of_month
+    last_date = Date.new(year, month, 1).at_end_of_month
+
+    history_meeting_ids =
+      Allocation
+        .joins(:meeting)
+        .where('make_date(meetings.year, meetings.month, 1) >= ?', first_date)
+        .where('make_date(meetings.year, meetings.month, 1) < ?', last_date)
+        .pluck(:meeting_id)
+
+    cross_users = ActiveRecord::Base.connection.execute(historycal_cross_join_statement(history_meeting_ids)).to_a
+
+    pair_cases = cross_users.map { |row| [row['first_el'], row['second_el']].sort }.uniq
+
+    @not_allowed_for_allocation =
+      all_candidates.each_with_object({}) do |user_id, hsh|
+        matches = Array.new
+
+        pair_cases.each do |pair|
+          if user_id == pair[0]
+            matches << pair[1].to_s
+          elsif user_id == pair[1]
+            matches << pair[0].to_s
+          end
+        end
+
+        matches.uniq!
+        hsh["#{user_id}"] = matches
+      end
+  end
+
+  def historycal_cross_join_statement(meeting_ids)
+    meeting_ids = [-1] if meeting_ids.empty?
+
+    "SELECT a1.user_id AS first_el, a2.user_id AS second_el
+       FROM allocations AS a1
+      CROSS JOIN allocations AS a2
+      WHERE a1.meeting_id = a2.meeting_id
+        AND a1.user_id != a2.user_id
+        AND a1.meeting_id IN (#{meeting_ids.join(',')});"
   end
 end

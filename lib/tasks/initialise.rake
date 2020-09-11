@@ -11,10 +11,12 @@ namespace :initialise do
       year = date.year
       month = date.month
 
+      puts "Started allocation for #{month}/#{year}"
+
       PairsMatcher.new(year: year, month: month).allocate
 
-      puts "Created the meetings for #{month}/#{year}"
-      puts "Duration - #{Time.now - start_time} sec."
+      puts "-----> Created meetings for #{month}/#{year}"
+      puts "       Duration - #{Time.now - start_time} sec."
 
       date += 1.month
     end
