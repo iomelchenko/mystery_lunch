@@ -21,6 +21,6 @@ class Meeting < ApplicationRecord
   scope :current, -> { where('year = ? AND month = ?', Date.current.year, Date.current.month) }
 
   scope :past, (lambda do
-    where('year = ? AND month < ? OR year < ?', Date.current.year, Date.current.month, Date.current.year)
+    where('(year = ? AND month < ?) OR year < ?', Date.current.year, Date.current.month, Date.current.year)
   end)
 end
