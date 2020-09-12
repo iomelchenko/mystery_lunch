@@ -3,8 +3,8 @@
 class AllowedAllocationsBuilder
   attr_reader :all_candidates, :users_for_allocation
 
-  def call
-    pair_cases, @all_candidates = select_all_candidates
+  def call(user_id = nil)
+    pair_cases, @all_candidates = select_all_candidates(user_id)
     build_users_for_allocation(all_candidates, pair_cases)
   end
 
@@ -25,8 +25,8 @@ class AllowedAllocationsBuilder
 
   private
 
-  def select_all_candidates
-    cross_users = ActiveRecord::Base.connection.execute(cross_users_statement).to_a
+  def select_all_candidates(user_id)
+    cross_users = ActiveRecord::Base.connection.execute(cross_users_statement(user_id)).to_a
 
     pair_cases = cross_users.map { |row| [row['first_el'], row['second_el']].sort }.uniq
     [pair_cases, pair_cases.flatten.uniq]
@@ -50,13 +50,16 @@ class AllowedAllocationsBuilder
       end
   end
 
-  def cross_users_statement
+  def cross_users_statement(user_id)
+    user_id ||= 'NULL'
+
     "SELECT u1.id AS first_el, u2.id AS second_el
        FROM users AS u1
       CROSS JOIN users AS u2
       WHERE u1.id != u2.id
         AND u1.state = 0
         AND u2.state = 0
+        AND (u1.id = COALESCE(#{user_id}, u1.id) OR u2.id = COALESCE(#{user_id}, u2.id))
         AND u1.department_id != u2.department_id;"
   end
 end

@@ -36,8 +36,35 @@ describe PairsMatcher do
             expect(meeting.users.pluck(:department_id).uniq.count).to eq(2)
           end
         end
+      end
 
-        # Inactive users!!!
+      context 'allocates only active users' do
+        before do
+          user1.update(state: :inactive)
+        end
+
+        it 'creates a proper meetings count' do
+          subject.allocate
+
+          expect(Meeting.count).to eq(2)
+        end
+
+        it 'creates a proper allocations count' do
+          subject.allocate
+
+          expect(Allocation.count).to eq(5)
+        end
+
+        it 'users department does not intersect' do
+          subject.allocate
+
+          meetings_with_departments_count =
+            Meeting.current.map do |meeting|
+              meeting.users.pluck(:department_id).uniq.count
+            end
+
+          expect(meetings_with_departments_count).to match_array([2, 3])
+        end
       end
 
       context 'odd users number' do
