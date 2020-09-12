@@ -28,7 +28,8 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
 
     if @user.save
-      # allocate new user to the existing pair
+      UsersManager.new.add_new_user(@user.id)
+
       flash[:success] = 'User was successfully created.' # Nice to tmplement it with i18n
       redirect_to @user
     else

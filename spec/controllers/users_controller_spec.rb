@@ -4,6 +4,9 @@ require 'rails_helper'
 
 RSpec.describe UsersController, type: :controller do
   let(:risk_department) { create :department, name: 'risk' }
+  let(:hr_department) { create :department, name: 'hr' }
+  let(:data_department) { create :department, name: 'data' }
+
   let!(:user) { create :user, department: risk_department }
   let(:password) { Faker::Internet.password(min_length: 6) }
 
@@ -68,6 +71,13 @@ RSpec.describe UsersController, type: :controller do
 
   describe 'POST #create' do
     context 'with valid params' do
+      let(:user2) { create :user, department: hr_department }
+      let(:user3) { create :user, department: data_department }
+
+      let(:meeting) { create :meeting }
+      let!(:allocation1) { create :allocation, meeting: meeting, user: user2 }
+      let!(:allocation2) { create :allocation, meeting: meeting, user: user3 }
+
       it 'creates a new user' do
         expect { post :create, params: { user: valid_attributes } }.to change(User, :count).by(1)
       end
@@ -83,6 +93,10 @@ RSpec.describe UsersController, type: :controller do
         post :create, params: { user: valid_attributes }
 
         expect(response).to redirect_to(User.last)
+      end
+
+      it 'joins a new user to the meeting' do
+        expect { post :create, params: { user: valid_attributes } }.to change(Allocation, :count).by(1)
       end
     end
 
@@ -142,8 +156,13 @@ RSpec.describe UsersController, type: :controller do
   end
 
   describe 'DELETE #destroy' do
+    let(:user2) { create :user, department: hr_department }
+    let(:meeting) { create :meeting }
+    let!(:allocation1) { create :allocation, meeting: meeting, user: user }
+    let!(:allocation2) { create :allocation, meeting: meeting, user: user2 }
+
     it 'does not destroy the requested user' do
-      expect { delete :destroy, params: { id: user.to_param } }.to change(User, :count).by(-0)
+      expect { delete :destroy, params: { id: user.to_param } }.to change(User, :count).by(0)
     end
 
     it 'redirects to the user url' do
@@ -156,6 +175,10 @@ RSpec.describe UsersController, type: :controller do
       delete :destroy, params: { id: user.to_param }
 
       expect(user.reload.state).to eq('inactive')
+    end
+
+    it 'removes user from meeting' do
+      expect { delete :destroy, params: { id: user.to_param } }.to change(Allocation, :count).by(-2)
     end
   end
 end

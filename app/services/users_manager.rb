@@ -27,6 +27,11 @@ class UsersManager
   end
 
   def add_new_user(user_id)
+    odd_user_matcher.call(
+      user_id,
+      allowed_ids(user_id),
+      not_allowed_ids([])
+    )
   end
 
   private
@@ -50,8 +55,10 @@ class UsersManager
   def allowed_ids(remaining_user_id)
     allowed_allocations_builder.call(remaining_user_id)
 
-    allowed_allocations_builder
-      .users_for_allocation[remaining_user_id.to_s][:allowed]
+    allowed = allowed_allocations_builder
+                .users_for_allocation[remaining_user_id.to_s]
+
+    allowed ? allowed[:allowed] : []
   end
 
   def not_allowed_ids(remaining_user_id)

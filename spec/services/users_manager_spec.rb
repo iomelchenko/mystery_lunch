@@ -58,4 +58,16 @@ describe UsersManager do
       end
     end
   end
+
+  describe '#add_new_user' do
+    context 'meeting with three users' do
+      let!(:user5) { create :user, department: sales_department }
+
+      it 'creates a new allocation' do
+        user1.update!(state: :inactive)
+
+        expect { subject.add_new_user(user5.id) }.to change(Allocation, :count).by(1)
+      end
+    end
+  end
 end
