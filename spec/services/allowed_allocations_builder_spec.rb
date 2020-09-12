@@ -30,7 +30,12 @@ describe AllowedAllocationsBuilder do
       expect(subject.users_for_allocation.count).to eq(5)
 
       User.all.each do |user|
-        expect(subject.users_for_allocation[user.id.to_s]).to match(allocations_obj[user.id.to_s])
+        allowed = subject.users_for_allocation[user.id.to_s]
+        expected = allocations_obj[user.id.to_s]
+        next unless allowed
+
+        expect(allowed[:allowed]).to match_array(expected[:allowed])
+        expect(allowed[:count]).to eq(expected[:count])
       end
     end
   end
