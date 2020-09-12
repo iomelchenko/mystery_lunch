@@ -15,7 +15,7 @@ class AllowedAllocationsBuilder
     users_for_allocation.delete(user_id)
     users_for_allocation.delete(matched_user_id)
 
-    users_for_allocation.each do |k, v|
+    users_for_allocation.each do |_k, v|
       v[:allowed].delete(user_id)
       v[:allowed].delete(matched_user_id)
 
@@ -35,7 +35,7 @@ class AllowedAllocationsBuilder
   def build_users_for_allocation(all_candidates, pair_cases)
     @users_for_allocation =
       all_candidates.each_with_object({}) do |user_id, hsh|
-        matches = Array.new
+        matches = []
 
         pair_cases.each do |pair|
           if user_id == pair[0]
@@ -46,7 +46,7 @@ class AllowedAllocationsBuilder
         end
 
         matches.uniq!
-        hsh["#{user_id}"] = { allowed: matches, count: matches.count }
+        hsh[user_id.to_s] = { allowed: matches, count: matches.count }
       end
   end
 
