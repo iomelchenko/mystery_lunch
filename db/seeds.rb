@@ -23,6 +23,8 @@ Department.delete_all
   Department.create!(name: depatment_name)
 end
 
+puts "-----> Generated #{Department.count} departments."
+
 User.create!(
   name: 'ADMIN',
   department: Department.find_by_name('HR'),
@@ -45,33 +47,6 @@ Department.pluck(:id).each do |department_id|
   end
 end
 
-current_year = Date.current.year
-current_month = Date.current.month
+puts "-----> Generated #{User.count} users."
 
-(current_month - 3).upto(current_month) do |month|
-  1.upto(User.count / 2).each do
-    Meeting.create!(
-      year: current_year,
-      month: month
-    )
-  end
-
-  user_ids = User.pluck(:id).shuffle
-  first_half_user_ids = user_ids[0...(User.count / 2)]
-  last_half_user_ids = user_ids - first_half_user_ids
-
-  Meeting.where(month: month).pluck(:id).each do |meeting_id|
-    Allocation.create!(
-      meeting_id: meeting_id,
-      user_id: first_half_user_ids[0]
-    )
-
-    Allocation.create!(
-      meeting_id: meeting_id,
-      user_id: last_half_user_ids[0]
-    )
-
-    first_half_user_ids.shift
-    last_half_user_ids.shift
-  end
-end
+Rake::Task['initialise:meetings_seeds'].invoke

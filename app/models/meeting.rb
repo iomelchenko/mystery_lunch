@@ -11,6 +11,8 @@
 #  updated_at :datetime         not null
 #
 class Meeting < ApplicationRecord
+  FORBIDDEN_PAIRS_PERIOD_IN_MONTHS = 3
+
   has_many :allocations
   has_many :users, through: :allocations
 
@@ -19,6 +21,6 @@ class Meeting < ApplicationRecord
   scope :current, -> { where('year = ? AND month = ?', Date.current.year, Date.current.month) }
 
   scope :past, (lambda do
-    where('year = ? AND month < ? OR year < ?', Date.current.year, Date.current.month, Date.current.year)
+    where('(year = ? AND month < ?) OR year < ?', Date.current.year, Date.current.month, Date.current.year)
   end)
 end
