@@ -10,11 +10,11 @@ class MeetingsSearcher
 
   def call
     allocations.then { |alloc| params[:sSearch].present? ? filter(alloc) : alloc }
-      .includes(:meeting, user: :department)
-      .includes(user: { avatar_attachment: :blob })
-      .order(meeting_id: :desc)
-      .page(page)
-      .per_page(per_page)
+               .includes(:meeting, user: :department)
+               .includes(user: { avatar_attachment: :blob })
+               .order(meeting_id: :desc)
+               .page(page)
+               .per_page(per_page)
   end
 
   private
@@ -28,11 +28,11 @@ class MeetingsSearcher
   end
 
   def page
-    params[:iDisplayStart].to_i/per_page + 1
+    params[:iDisplayStart].to_i / per_page + 1
   end
 
   def per_page
-    params[:iDisplayLength].to_i > 0 ? params[:iDisplayLength].to_i : 10
+    params[:iDisplayLength].to_i.positive? ? params[:iDisplayLength].to_i : 10
   end
 
   def filter(allocations)
@@ -49,6 +49,5 @@ class MeetingsSearcher
                     AND (d.name ILIKE :search OR u.name ILIKE :search))",
         search: "%#{params[:sSearch]}%"
       )
-
   end
 end

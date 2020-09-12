@@ -10,13 +10,13 @@ class PairsMatcher
               :odd_user_obj
 
   def initialize(
-        month: Date.current.month,
-        year: Date.current.year,
-        allowed_allocations_builder: AllowedAllocationsBuilder,
-        excluded_users_buider: ExcludedUsersBuilder,
-        meetings_creator: MeetingsCreator,
-        odd_user_matcher: OddUserMatcher
-      )
+    month: Date.current.month,
+    year: Date.current.year,
+    allowed_allocations_builder: AllowedAllocationsBuilder,
+    excluded_users_buider: ExcludedUsersBuilder,
+    meetings_creator: MeetingsCreator,
+    odd_user_matcher: OddUserMatcher
+  )
 
     @month = month
     @year = year
@@ -73,7 +73,7 @@ class PairsMatcher
     excluded_users_buider.call(allowed_allocations_builder.all_candidates)
   end
 
-  def min_by_allowed(ids=nil)
+  def min_by_allowed(ids = nil)
     if ids
       allowed_allocations_builder.users_for_allocation.select { |k, _v| ids.include?(k) }
     else

@@ -3,11 +3,7 @@
 class ExcludedUsersBuilder
   attr_reader :not_allowed_for_allocation, :month, :year
 
-  def initialize(
-        month: Date.current.month,
-        year: Date.current.year
-      )
-
+  def initialize(month: Date.current.month, year: Date.current.year)
     @month = month
     @year = year
   end
@@ -25,19 +21,19 @@ class ExcludedUsersBuilder
 
     @not_allowed_for_allocation =
       all_candidates
-        .each_with_object({}) do |user_id, hsh|
-          matches = Array.new
+      .each_with_object({}) do |user_id, hsh|
+        matches = []
 
-          pair_cases.each do |pair|
-            if user_id == pair[0]
-              matches << pair[1].to_s
-            elsif user_id == pair[1]
-              matches << pair[0].to_s
-            end
+        pair_cases.each do |pair|
+          if user_id == pair[0]
+            matches << pair[1].to_s
+          elsif user_id == pair[1]
+            matches << pair[0].to_s
           end
+        end
 
-          matches.uniq!
-          hsh["#{user_id}"] = matches
+        matches.uniq!
+        hsh[user_id.to_s] = matches
       end
   end
 
@@ -52,7 +48,7 @@ class ExcludedUsersBuilder
         AND a1.meeting_id IN (#{meeting_ids.join(',')});"
   end
 
-  def  history_meeting_ids
+  def history_meeting_ids
     first_date = ::Meeting::FORBIDDEN_PAIRS_PERIOD_IN_MONTHS.month.ago.at_beginning_of_month
     last_date = Date.new(year, month, 1).at_end_of_month
 

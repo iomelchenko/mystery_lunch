@@ -52,7 +52,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
 
     if @user.update(state: :inactive)
-      # allocate remaining employee to the another pair
+      UsersManager.new.delete_from_meeting(@user.id)
 
       flash[:success] = 'User was deactivated.'
     end

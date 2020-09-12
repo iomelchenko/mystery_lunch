@@ -18,12 +18,12 @@ class MeetingsDatatable
 
   private
 
-  def as_json(options = {})
+  def as_json(_options = {})
     {
-      sEcho:                params[:sEcho].to_i,
-      iTotalRecords:        collection_count,
+      sEcho: params[:sEcho].to_i,
+      iTotalRecords: collection_count,
       iTotalDisplayRecords: collection_count,
-      aaData:               data
+      aaData: data
     }
   end
 
@@ -54,10 +54,10 @@ class MeetingsDatatable
   def get_avatar_url(user)
     return gravatar(user) unless user.avatar.present?
 
-    polymorphic_path(user.avatar.variant(resize: "75x75"))
+    polymorphic_path(user.avatar.variant(resize: '75x75'))
   end
 
   def gravatar(user)
-    "#{::User::GRAVATAR_URL}?gravatar_id=#{Digest::MD5::hexdigest(user.email)}?d=wavatar"
+    "#{::User::GRAVATAR_URL}?gravatar_id=#{Digest::MD5.hexdigest(user.email)}?d=wavatar"
   end
 end

@@ -9,7 +9,7 @@ class OddUserMatcher
   end
 
   def call(odd_user_id, allowed_ids, not_allowed_ids)
-    meeting_id = find_meeting_id(odd_user_id, allowed_ids, not_allowed_ids)
+    meeting_id = find_meeting_id(allowed_ids, not_allowed_ids)
 
     return unless meeting_id
 
@@ -18,14 +18,14 @@ class OddUserMatcher
 
   private
 
-  def find_meeting_id(odd_user_id, allowed_ids, not_allowed_ids)
+  def find_meeting_id(allowed_ids, not_allowed_ids)
     (allowed_ids - not_allowed_ids).each do |candidate_id|
       meeting =
         Meeting
-          .joins(:allocations)
-          .where('allocations.user_id = ?', candidate_id)
-          .where(id: current_meeting_ids_with_two_users)
-          .first
+        .joins(:allocations)
+        .where('allocations.user_id = ?', candidate_id)
+        .where(id: current_meeting_ids_with_two_users)
+        .first
 
       next unless meeting
 
@@ -42,9 +42,9 @@ class OddUserMatcher
     Allocation
       .joins(:meeting)
       .where('meetings.year = ? AND meetings.month = ?', year, month)
-      .select("meeting_id, COUNT(1)")
+      .select('meeting_id, COUNT(1)')
       .group(:meeting_id)
-      .having("COUNT(1) = 2")
+      .having('COUNT(1) = 2')
       .pluck(:meeting_id)
   end
 
