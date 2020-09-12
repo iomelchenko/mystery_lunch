@@ -3,6 +3,7 @@
 class PairsMatcher
   attr_reader :allowed_allocations_builder,
               :excluded_users_buider,
+              :meetings_creator,
               :month,
               :year,
               :odd_user_obj
@@ -11,13 +12,15 @@ class PairsMatcher
         month: Date.current.month,
         year: Date.current.year,
         allowed_allocations_builder: AllowedAllocationsBuilder,
-        excluded_users_buider: ExcludedUsersBuilder
+        excluded_users_buider: ExcludedUsersBuilder,
+        meetings_creator: MeetingsCreator
       )
 
     @month = month
     @year = year
     @allowed_allocations_builder = allowed_allocations_builder.new
     @excluded_users_buider = excluded_users_buider.new(month: month, year: year)
+    @meetings_creator = meetings_creator.new(month: month, year: year)
   end
 
   def allocate
@@ -42,9 +45,13 @@ class PairsMatcher
 
       break unless matched_user_id
 
-      meeting_params = buid_meeting_params(user_id, matched_user_id)
-      create_meeting(meeting_params)
-      allowed_allocations_builder.remove_from_available(meeting_params)
+      meetings_creator.call(user_id, matched_user_id)
+
+      allowed_allocations_builder
+        .remove_from_available(
+          user_id: user_id,
+          matched_user_id: matched_user_id
+        )
     end
   end
 
@@ -81,27 +88,6 @@ class PairsMatcher
 
     Allocation.where(meeting_id: meeting_ids_for_delete).delete_all
     Meeting.where(id: meeting_ids_for_delete).delete_all
-  end
-
-  def create_meeting(meeting_params)
-    meeting = Meeting.create!(
-      year: year,
-      month: month
-    )
-
-    [meeting_params[:user_id], meeting_params[:matched_user_id]].each do |user_id|
-      Allocation.create!(
-        meeting_id: meeting.id,
-        user_id: user_id
-      )
-    end
-  end
-
-  def buid_meeting_params(user_id, matched_user_id)
-    {
-      user_id: user_id,
-      matched_user_id: matched_user_id
-    }
   end
 
   def allocate_odd_user

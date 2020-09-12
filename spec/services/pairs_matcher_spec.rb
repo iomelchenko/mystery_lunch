@@ -18,19 +18,19 @@ describe PairsMatcher do
     context 'without historical data' do
       context 'even users number' do
         it 'creates a proper meetings count' do
-          described_class.new.allocate
+          subject.allocate
 
           expect(Meeting.count).to eq(3)
         end
 
         it 'creates a proper allocations count' do
-          described_class.new.allocate
+          subject.allocate
 
           expect(Allocation.count).to eq(6)
         end
 
         it 'users department does not intersect' do
-          described_class.new.allocate
+          subject.allocate
 
           Meeting.all.each do |meeting|
             expect(meeting.users.pluck(:department_id).uniq.count).to eq(2)
@@ -44,19 +44,19 @@ describe PairsMatcher do
         let!(:user7) { create :user, department: hr_department }
 
         it 'creates a proper meetings count' do
-          described_class.new.allocate
+          subject.allocate
 
           expect(Meeting.count).to eq(3)
         end
 
         it 'creates a proper allocations count' do
-          described_class.new.allocate
+          subject.allocate
 
           expect(Allocation.count).to eq(7)
         end
 
         it 'users department does not intersect' do
-          described_class.new.allocate
+          subject.allocate
 
           meetings_with_departments_count =
             Meeting.all.map do |meeting|
@@ -87,19 +87,19 @@ describe PairsMatcher do
 
       context 'even users number' do
         it 'creates a proper meetings count' do
-          described_class.new.allocate
+          subject.allocate
 
           expect(Meeting.current.count).to eq(3)
         end
 
         it 'creates a proper allocations count' do
-          described_class.new.allocate
+          subject.allocate
 
           expect(Allocation.with_current_meetings.count).to eq(6)
         end
 
         it 'users department does not intersect' do
-          described_class.new.allocate
+          subject.allocate
 
           Meeting.current.each do |meeting|
             expect(meeting.users.pluck(:department_id).uniq.count).to eq(2)
@@ -112,19 +112,19 @@ describe PairsMatcher do
         let!(:odd_allocation) { create :allocation, meeting: meeting1, user: user7 }
 
         it 'creates a proper meetings count' do
-          described_class.new.allocate
+          subject.allocate
 
           expect(Meeting.current.count).to eq(3)
         end
 
         it 'creates a proper allocations count' do
-          described_class.new.allocate
+          subject.allocate
 
           expect(Allocation.with_current_meetings.count).to eq(7)
         end
 
         it 'users department does not intersect' do
-          described_class.new.allocate
+          subject.allocate
 
           meetings_with_departments_count =
             Meeting.current.map do |meeting|

@@ -34,8 +34,6 @@ describe ExcludedUsersBuilder do
   let!(:allocation9) { create :allocation, meeting: meeting4, user: user1 }
   let!(:allocation10) { create :allocation, meeting: meeting4, user: user3 }
 
-  let(:builder) { described_class.new }
-
   let(:all_candidates) { User.active.map(&:id) }
 
     let(:not_allowed_obj) do
@@ -52,12 +50,12 @@ describe ExcludedUsersBuilder do
 
   describe '#call' do
     it 'creates a proper object' do
-      builder.call(all_candidates)
+      subject.call(all_candidates)
 
-      expect(builder.not_allowed_for_allocation.count).to eq(7)
+      expect(subject.not_allowed_for_allocation.count).to eq(7)
 
       User.all.each do |user|
-        expect(builder.not_allowed_for_allocation[user.id.to_s]).to match_array(not_allowed_obj[user.id.to_s])
+        expect(subject.not_allowed_for_allocation[user.id.to_s]).to match_array(not_allowed_obj[user.id.to_s])
       end
     end
   end

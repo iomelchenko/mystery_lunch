@@ -13,8 +13,6 @@ describe AllowedAllocationsBuilder do
   let!(:user4) { create :user, department: sales_department }
   let!(:user5) { create :user, department: hr_department }
 
-  let(:builder) { described_class.new }
-
   describe '#call' do
     let(:allocations_obj) do
       {
@@ -27,12 +25,12 @@ describe AllowedAllocationsBuilder do
     end
 
     it 'creates a proper object' do
-      builder.call
+      subject.call
 
-      expect(builder.users_for_allocation.count).to eq(5)
+      expect(subject.users_for_allocation.count).to eq(5)
 
       User.all.each do |user|
-        expect(builder.users_for_allocation[user.id.to_s]).to match(allocations_obj[user.id.to_s])
+        expect(subject.users_for_allocation[user.id.to_s]).to match(allocations_obj[user.id.to_s])
       end
     end
   end
@@ -46,22 +44,20 @@ describe AllowedAllocationsBuilder do
       }
     end
 
-    let(:builder) { described_class.new }
-
     before do
-      builder.call
+      subject.call
     end
 
     it 'removes objects from hash object' do
-      builder.remove_from_available(
+      subject.remove_from_available(
         user_id: user1.id.to_s,
         matched_user_id: user3.id.to_s
       )
 
-      expect(builder.users_for_allocation.count).to eq(3)
+      expect(subject.users_for_allocation.count).to eq(3)
 
       User.all.each do |user|
-        expect(builder.users_for_allocation[user.id.to_s]).to match(allocations_obj[user.id.to_s])
+        expect(subject.users_for_allocation[user.id.to_s]).to match(allocations_obj[user.id.to_s])
       end
     end
   end
