@@ -82,8 +82,8 @@ describe PairsMatcher do
       let!(:allocation4) { create :allocation, meeting: meeting2, user: user5 }
 
       let(:meeting3) { create :meeting, year: historical_date2.year, month: historical_date2.month }
-      let!(:allocation5) { create :allocation, meeting: meeting3, user: user1 }
-      let!(:allocation6) { create :allocation, meeting: meeting3, user: user4 }
+      let!(:allocation5) { create :allocation, meeting: meeting3, user: user4 }
+      let!(:allocation6) { create :allocation, meeting: meeting3, user: user6 }
 
       context 'even users number' do
         it 'creates a proper meetings count' do

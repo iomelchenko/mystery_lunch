@@ -4,6 +4,7 @@ class PairsMatcher
   attr_reader :allowed_allocations_builder,
               :excluded_users_buider,
               :meetings_creator,
+              :odd_user_matcher,
               :month,
               :year,
               :odd_user_obj
@@ -13,7 +14,8 @@ class PairsMatcher
         year: Date.current.year,
         allowed_allocations_builder: AllowedAllocationsBuilder,
         excluded_users_buider: ExcludedUsersBuilder,
-        meetings_creator: MeetingsCreator
+        meetings_creator: MeetingsCreator,
+        odd_user_matcher: OddUserMatcher
       )
 
     @month = month
@@ -21,6 +23,7 @@ class PairsMatcher
     @allowed_allocations_builder = allowed_allocations_builder.new
     @excluded_users_buider = excluded_users_buider.new(month: month, year: year)
     @meetings_creator = meetings_creator.new(month: month, year: year)
+    @odd_user_matcher = odd_user_matcher.new(month: month, year: year)
   end
 
   def allocate
@@ -94,25 +97,9 @@ class PairsMatcher
     return unless @odd_user_obj
 
     odd_user_id = @odd_user_obj[0]
+    not_allowed_ids = excluded_users_buider.not_allowed_for_allocation[odd_user_id]
     allowed_ids = @odd_user_obj[1][:allowed]
 
-    allowed_ids.each do |allowed_id|
-      meeting =
-        Meeting
-          .where(year: year, month: month)
-          .joins(:allocations)
-          .where('allocations.user_id = ?', allowed_id)
-          .first
-
-      next unless Allocation.where(meeting_id: meeting.id, user_id: (allowed_ids - [allowed_id])).any?
-
-      join_existing_meeting(odd_user_id, meeting.id)
-
-      break
-    end
-  end
-
-  def join_existing_meeting(user_id, meeting_id)
-    Allocation.create!(meeting_id: meeting_id, user_id: user_id)
+    odd_user_matcher.call(odd_user_id, allowed_ids, not_allowed_ids)
   end
 end
