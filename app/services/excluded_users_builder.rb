@@ -26,14 +26,14 @@ class ExcludedUsersBuilder
 
         pair_cases.each do |pair|
           if user_id == pair[0]
-            matches << pair[1].to_s
+            matches << pair[1]
           elsif user_id == pair[1]
-            matches << pair[0].to_s
+            matches << pair[0]
           end
         end
 
         matches.uniq!
-        hsh[user_id.to_s] = matches
+        hsh[user_id] = matches
       end
   end
 

@@ -55,17 +55,17 @@ class AllowedAllocationsBuilder
 
         pair_cases.each do |pair|
           if user_id == pair[0]
-            matches << pair[1].to_s
+            matches << pair[1]
           elsif user_id == pair[1]
-            matches << pair[0].to_s
+            matches << pair[0]
           end
         end
 
         matches.uniq!
-        matches = matches - excluded_users_buider.not_allowed_for_allocation[user_id.to_s]
+        matches = matches - excluded_users_buider.not_allowed_for_allocation[user_id]
         next if matches.empty?
 
-        hsh[user_id.to_s] =
+        hsh[user_id] =
           {
             allowed: matches,
             count: matches.count

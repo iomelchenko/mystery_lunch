@@ -38,13 +38,13 @@ describe ExcludedUsersBuilder do
 
     let(:not_allowed_obj) do
       {
-        user1.id.to_s => [user2.id.to_s, user3.id.to_s, user5.id.to_s],
-        user2.id.to_s => [user1.id.to_s],
-        user3.id.to_s => [user1.id.to_s, user4.id.to_s, user5.id.to_s],
-        user4.id.to_s => [user3.id.to_s],
-        user5.id.to_s => [user1.id.to_s, user3.id.to_s, user6.id.to_s, user7.id.to_s],
-        user6.id.to_s => [user5.id.to_s, user7.id.to_s],
-        user7.id.to_s => [user5.id.to_s, user6.id.to_s]
+        user1.id => [user2.id, user3.id, user5.id],
+        user2.id => [user1.id],
+        user3.id => [user1.id, user4.id, user5.id],
+        user4.id => [user3.id],
+        user5.id => [user1.id, user3.id, user6.id, user7.id],
+        user6.id => [user5.id, user7.id],
+        user7.id => [user5.id, user6.id]
       }
     end
 
@@ -55,7 +55,7 @@ describe ExcludedUsersBuilder do
       expect(subject.not_allowed_for_allocation.count).to eq(7)
 
       User.all.each do |user|
-        expect(subject.not_allowed_for_allocation[user.id.to_s]).to match_array(not_allowed_obj[user.id.to_s])
+        expect(subject.not_allowed_for_allocation[user.id]).to match_array(not_allowed_obj[user.id])
       end
     end
   end
