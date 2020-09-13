@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe AllowedAllocationsBuilder do
+describe Matcher::AllowedAllocationsBuilder do
   let(:risk_department) { create :department, name: 'risk' }
   let(:sales_department) { create :department, name: 'sales' }
   let(:hr_department) { create :department, name: 'HR' }
@@ -16,11 +16,11 @@ describe AllowedAllocationsBuilder do
   describe '#call' do
     let(:allocations_obj) do
       {
-        user1.id.to_s => { :allowed => [user3.id.to_s, user4.id.to_s, user5.id.to_s], :count => 3 },
-        user2.id.to_s => { :allowed => [user3.id.to_s, user4.id.to_s, user5.id.to_s], :count => 3 },
-        user3.id.to_s => { :allowed => [user1.id.to_s, user2.id.to_s, user5.id.to_s], :count => 3 },
-        user4.id.to_s => { :allowed => [user1.id.to_s, user2.id.to_s, user5.id.to_s], :count => 3 },
-        user5.id.to_s => { :allowed => [user1.id.to_s, user2.id.to_s, user3.id.to_s, user4.id.to_s], :count => 4 }
+        user1.id => { :allowed => [user3.id, user4.id, user5.id], :count => 3 },
+        user2.id => { :allowed => [user3.id, user4.id, user5.id], :count => 3 },
+        user3.id => { :allowed => [user1.id, user2.id, user5.id], :count => 3 },
+        user4.id => { :allowed => [user1.id, user2.id, user5.id], :count => 3 },
+        user5.id => { :allowed => [user1.id, user2.id, user3.id, user4.id], :count => 4 }
       }
     end
 
@@ -30,8 +30,8 @@ describe AllowedAllocationsBuilder do
       expect(subject.users_for_allocation.count).to eq(5)
 
       User.all.each do |user|
-        allowed = subject.users_for_allocation[user.id.to_s]
-        expected = allocations_obj[user.id.to_s]
+        allowed = subject.users_for_allocation[user.id]
+        expected = allocations_obj[user.id]
         next unless allowed
 
         expect(allowed[:allowed]).to match_array(expected[:allowed])
@@ -43,9 +43,9 @@ describe AllowedAllocationsBuilder do
   describe '#remove_from_available' do
     let(:allocations_obj) do
       {
-        user2.id.to_s => { :allowed => [user4.id.to_s, user5.id.to_s], :count => 2 },
-        user4.id.to_s => { :allowed => [user2.id.to_s, user5.id.to_s], :count => 2 },
-        user5.id.to_s => { :allowed => [user2.id.to_s, user4.id.to_s], :count => 2 }
+        user2.id => { :allowed => [user4.id, user5.id], :count => 2 },
+        user4.id => { :allowed => [user2.id, user5.id], :count => 2 },
+        user5.id => { :allowed => [user2.id, user4.id], :count => 2 }
       }
     end
 
@@ -55,15 +55,15 @@ describe AllowedAllocationsBuilder do
 
     it 'removes objects from hash object' do
       subject.remove_from_available(
-        user_id: user1.id.to_s,
-        matched_user_id: user3.id.to_s
+        user_id: user1.id,
+        matched_user_id: user3.id
       )
 
       expect(subject.users_for_allocation.count).to eq(3)
 
       User.all.each do |user|
-        allowed = subject.users_for_allocation[user.id.to_s]
-        expected = allocations_obj[user.id.to_s]
+        allowed = subject.users_for_allocation[user.id]
+        expected = allocations_obj[user.id]
         next unless allowed
 
         expect(allowed[:allowed]).to match_array(expected[:allowed])

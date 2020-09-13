@@ -13,7 +13,7 @@ namespace :initialise do
 
       puts "Started allocation for #{month}/#{year}"
 
-      PairsMatcher.new(year: year, month: month).allocate
+      Matcher::PairsMatcher.new(year: year, month: month).allocate
 
       puts "-----> Created meetings for #{month}/#{year}"
       puts "       Duration - #{Time.now - start_time} sec."
