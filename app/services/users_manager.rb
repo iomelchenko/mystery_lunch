@@ -5,8 +5,8 @@ class UsersManager
               :odd_user_matcher
 
   def initialize(
-    allowed_allocations_builder: AllowedAllocationsBuilder,
-    odd_user_matcher: OddUserMatcher
+    allowed_allocations_builder: Matcher::AllowedAllocationsBuilder,
+    odd_user_matcher: Matcher::OddUserMatcher
   )
 
     @allowed_allocations_builder = allowed_allocations_builder.new

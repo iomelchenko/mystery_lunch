@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe OddUserMatcher do
+describe Matcher::OddUserMatcher do
   let(:risk_department) { create :department, name: 'risk' }
   let(:sales_department) { create :department, name: 'sales' }
   let(:development_department) { create :department, name: 'development' }

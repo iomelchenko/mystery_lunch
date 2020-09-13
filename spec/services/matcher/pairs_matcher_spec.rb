@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe PairsMatcher do
+describe Matcher::PairsMatcher do
   let(:risk_department) { create :department, name: 'risk' }
   let(:sales_department) { create :department, name: 'sales' }
   let(:hr_department) { create :department, name: 'HR' }

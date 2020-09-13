@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe AllowedAllocationsBuilder do
+describe Matcher::AllowedAllocationsBuilder do
   let(:risk_department) { create :department, name: 'risk' }
   let(:sales_department) { create :department, name: 'sales' }
   let(:hr_department) { create :department, name: 'HR' }
