@@ -33,6 +33,7 @@ gem 'bootsnap', '>= 1.4.2', require: false
 gem "mini_magick"
 gem 'rubocop'
 gem 'will_paginate'
+gem 'whenever', require: false
 
 group :development, :test do
   gem 'pry'

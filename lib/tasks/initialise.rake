@@ -21,4 +21,18 @@ namespace :initialise do
       date += 1.month
     end
   end
+
+  task current_month: :environment do
+    start_time = Time.now
+    current_date = Date.current
+    year = current_date.year
+    month = current_date.month
+
+    puts "Started allocation for #{month}/#{year}"
+
+    Matcher::PairsMatcher.new(year: year, month: month).allocate
+
+    puts "-----> Created meetings for #{month}/#{year}"
+    puts "       Duration - #{Time.now - start_time} sec."
+  end
 end
