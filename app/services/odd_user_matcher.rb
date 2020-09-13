@@ -8,8 +8,8 @@ class OddUserMatcher
     @year = year
   end
 
-  def call(odd_user_id, allowed_ids, not_allowed_ids)
-    meeting_id = find_meeting_id(allowed_ids, not_allowed_ids)
+  def call(odd_user_id, allowed_ids)
+    meeting_id = find_meeting_id(allowed_ids)
 
     return unless meeting_id
 
@@ -18,8 +18,8 @@ class OddUserMatcher
 
   private
 
-  def find_meeting_id(allowed_ids, not_allowed_ids)
-    (allowed_ids - not_allowed_ids).each do |candidate_id|
+  def find_meeting_id(allowed_ids)
+    allowed_ids.each do |candidate_id|
       meeting =
         Meeting
         .joins(:allocations)
@@ -29,7 +29,7 @@ class OddUserMatcher
 
       next unless meeting
 
-      second_candidate_ids = allowed_ids - not_allowed_ids - [candidate_id]
+      second_candidate_ids = allowed_ids - [candidate_id]
       next unless Allocation.where(meeting_id: meeting.id, user_id: second_candidate_ids).any?
 
       return meeting.id

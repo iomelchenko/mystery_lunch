@@ -1,10 +1,26 @@
 # frozen_string_literal: true
 
 class AllowedAllocationsBuilder
-  attr_reader :all_candidates, :users_for_allocation
+  attr_reader :all_candidates,
+              :users_for_allocation,
+              :excluded_users_buider,
+              :year,
+              :month
+
+  def initialize(
+    excluded_users_buider: ExcludedUsersBuilder,
+    month: Date.current.month,
+    year: Date.current.year
+  )
+
+    @month = month
+    @year = year
+    @excluded_users_buider = excluded_users_buider.new(year: @year, month: @month)
+  end
 
   def call(user_id = nil)
     pair_cases, @all_candidates = select_all_candidates(user_id)
+    excluded_users_buider.call(@all_candidates)
     build_users_for_allocation(all_candidates, pair_cases)
   end
 
@@ -12,12 +28,12 @@ class AllowedAllocationsBuilder
     user_id = meeting_params[:user_id]
     matched_user_id = meeting_params[:matched_user_id]
 
-    users_for_allocation.delete(user_id)
-    users_for_allocation.delete(matched_user_id)
+    users_for_allocation.delete(user_id) if user_id
+    users_for_allocation.delete(matched_user_id) if matched_user_id
 
     users_for_allocation.each do |_k, v|
-      v[:allowed].delete(user_id)
-      v[:allowed].delete(matched_user_id)
+      v[:allowed].delete(user_id) if user_id
+      v[:allowed].delete(matched_user_id) if matched_user_id
 
       v[:count] = v[:allowed].count
     end
@@ -46,7 +62,14 @@ class AllowedAllocationsBuilder
         end
 
         matches.uniq!
-        hsh[user_id.to_s] = { allowed: matches, count: matches.count }
+        matches = matches - excluded_users_buider.not_allowed_for_allocation[user_id.to_s]
+        next if matches.empty?
+
+        hsh[user_id.to_s] =
+          {
+            allowed: matches,
+            count: matches.count
+          }
       end
   end
 

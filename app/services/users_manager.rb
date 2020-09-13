@@ -2,17 +2,14 @@
 
 class UsersManager
   attr_reader :allowed_allocations_builder,
-              :excluded_users_buider,
               :odd_user_matcher
 
   def initialize(
     allowed_allocations_builder: AllowedAllocationsBuilder,
-    excluded_users_buider: ExcludedUsersBuilder,
     odd_user_matcher: OddUserMatcher
   )
 
     @allowed_allocations_builder = allowed_allocations_builder.new
-    @excluded_users_buider = excluded_users_buider.new
     @odd_user_matcher = odd_user_matcher.new
   end
 
@@ -29,8 +26,7 @@ class UsersManager
   def add_new_user(user_id)
     odd_user_matcher.call(
       user_id,
-      allowed_ids(user_id),
-      not_allowed_ids([])
+      allowed_ids(user_id)
     )
   end
 
@@ -43,8 +39,7 @@ class UsersManager
 
     odd_user_matcher.call(
       remaining_user_id,
-      allowed_ids(remaining_user_id),
-      not_allowed_ids(remaining_user_id)
+      allowed_ids(remaining_user_id)
     )
   end
 
@@ -59,12 +54,5 @@ class UsersManager
                 .users_for_allocation[remaining_user_id.to_s]
 
     allowed ? allowed[:allowed] : []
-  end
-
-  def not_allowed_ids(remaining_user_id)
-    excluded_users_buider.call([remaining_user_id])
-
-    excluded_users_buider
-      .not_allowed_for_allocation[remaining_user_id.to_s]
   end
 end

@@ -2,7 +2,6 @@
 
 class PairsMatcher
   attr_reader :allowed_allocations_builder,
-              :excluded_users_buider,
               :meetings_creator,
               :odd_user_matcher,
               :month,
@@ -13,7 +12,6 @@ class PairsMatcher
     month: Date.current.month,
     year: Date.current.year,
     allowed_allocations_builder: AllowedAllocationsBuilder,
-    excluded_users_buider: ExcludedUsersBuilder,
     meetings_creator: MeetingsCreator,
     odd_user_matcher: OddUserMatcher
   )
@@ -21,7 +19,6 @@ class PairsMatcher
     @month = month
     @year = year
     @allowed_allocations_builder = allowed_allocations_builder.new
-    @excluded_users_buider = excluded_users_buider.new(month: month, year: year)
     @meetings_creator = meetings_creator.new(month: month, year: year)
     @odd_user_matcher = odd_user_matcher.new(month: month, year: year)
   end
@@ -29,7 +26,6 @@ class PairsMatcher
   def allocate
     delete_meetings
     build_users_for_allocation
-    build_not_allowed_for_allocation
 
     take_odd_user
     process_allocation
@@ -40,11 +36,11 @@ class PairsMatcher
 
   def process_allocation
     loop do
-      user_id, user_obj = min_by_allowed
+      user_id, user_obj = take_user_id
 
       break if user_id.nil?
 
-      matched_user_id = take_match(user_id, user_obj)
+      matched_user_id = take_user_id(user_obj[:allowed])&.first
 
       break unless matched_user_id
 
@@ -61,7 +57,7 @@ class PairsMatcher
   def take_odd_user
     return unless allowed_allocations_builder.users_for_allocation.count.odd?
 
-    @odd_user_obj = min_by_allowed
+    @odd_user_obj = take_user_id([allowed_allocations_builder.users_for_allocation.keys.shuffle[-1]])
     allowed_allocations_builder.remove_from_available(user_id: @odd_user_obj[0])
   end
 
@@ -69,21 +65,23 @@ class PairsMatcher
     allowed_allocations_builder.call
   end
 
-  def build_not_allowed_for_allocation
-    excluded_users_buider.call(allowed_allocations_builder.all_candidates)
-  end
+  def take_user_id(ids = nil)
+    return if !ids.nil? && ids.empty?
 
-  def min_by_allowed(ids = nil)
-    if ids
-      allowed_allocations_builder.users_for_allocation.select { |k, _v| ids.include?(k) }
-    else
-      allowed_allocations_builder.users_for_allocation
-    end.min_by { |_k, v| v[:count] }
-  end
+    allowed = if ids.present?
+                 allowed_allocations_builder.users_for_allocation.select { |k, _v| ids.include?(k) }
+               else
+                 allowed_allocations_builder.users_for_allocation
+               end
 
-  def take_match(user_id, user_obj)
-    not_allowed = excluded_users_buider.not_allowed_for_allocation[user_id]
-    min_by_allowed(user_obj[:allowed] - not_allowed)&.first
+    return unless allowed.present?
+    return [allowed.keys[0], allowed.values[0]] if allowed.count == 1
+
+    min_count = allowed.min_by { |_k, v| v[:count] }[1][:count]
+    allowed
+      .map { |k, v| [k, v] if v[:count] == min_count }
+      .compact
+      .shuffle[-1]
   end
 
   def delete_meetings
@@ -97,9 +95,8 @@ class PairsMatcher
     return unless @odd_user_obj
 
     odd_user_id = @odd_user_obj[0]
-    not_allowed_ids = excluded_users_buider.not_allowed_for_allocation[odd_user_id]
     allowed_ids = @odd_user_obj[1][:allowed]
 
-    odd_user_matcher.call(odd_user_id, allowed_ids, not_allowed_ids)
+    odd_user_matcher.call(odd_user_id, allowed_ids)
   end
 end

@@ -5,13 +5,13 @@ require 'rails_helper'
 describe MeetingsSearcher do
   let(:risk_department) { create :department, name: 'risk' }
   let(:sales_department) { create :department, name: 'sales' }
-  let(:hr_department) { create :department, name: 'HR' }
+  let(:development_department) { create :department, name: 'development' }
 
   let(:user1) { create :user, department: risk_department }
   let(:user2) { create :user, department: sales_department }
   let(:user3) { create :user, department: risk_department }
   let(:user4) { create :user, department: sales_department }
-  let(:user5) { create :user, department: hr_department }
+  let(:user5) { create :user, department: development_department }
   let(:user6) { create :user, department: risk_department }
 
   let(:meeting1) { create :meeting }
@@ -63,7 +63,7 @@ describe MeetingsSearcher do
     end
 
     it 'returns valid search results for hr department' do
-      search_result = described_class.new({ sSearch: hr_department.name }, all_allocations).call
+      search_result = described_class.new({ sSearch: development_department.name }, all_allocations).call
 
       expect(search_result.count).to eql(2)
       expect(search_result).to match_array(Allocation.where(meeting: meeting3))

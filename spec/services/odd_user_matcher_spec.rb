@@ -17,15 +17,14 @@ describe OddUserMatcher do
   let!(:allocation2) { create :allocation, meeting: meeting, user: user2 }
 
   let(:allowed_ids) { [user1.id, user2.id] }
-  let(:not_allowed_ids) { [] }
 
   context 'for meeting with two users' do
     it 'creates a new allocation' do
-      expect { subject.call(user3.id, allowed_ids, not_allowed_ids) }.to change(Allocation, :count).by(1)
+      expect { subject.call(user3.id, allowed_ids) }.to change(Allocation, :count).by(1)
     end
 
     it 'creates a proper allocations entity' do
-      subject.call(user3.id, allowed_ids, not_allowed_ids)
+      subject.call(user3.id, allowed_ids)
       created_allocation = Allocation.last
 
       expect(created_allocation.user_id).to eq(user3.id)
@@ -35,13 +34,7 @@ describe OddUserMatcher do
     it 'does not create a new allocation in case of only one allowed id' do
       allowed_ids = [user1.id]
 
-      expect { subject.call(user3.id, allowed_ids, not_allowed_ids) }.to change(Allocation, :count).by(0)
-    end
-
-    it 'does not create a new allocation in case of one user_id is not allowed' do
-      not_allowed_ids = [user2.id]
-
-      expect { subject.call(user3.id, allowed_ids, not_allowed_ids) }.to change(Allocation, :count).by(0)
+      expect { subject.call(user3.id, allowed_ids) }.to change(Allocation, :count).by(0)
     end
   end
 
@@ -52,7 +45,7 @@ describe OddUserMatcher do
     it 'does not create a new allocation' do
       allowed_ids = [user1.id, user2.id, user4.id]
 
-      expect { subject.call(user3.id, allowed_ids, not_allowed_ids) }.to change(Allocation, :count).by(0)
+      expect { subject.call(user3.id, allowed_ids) }.to change(Allocation, :count).by(0)
     end
   end
 end
