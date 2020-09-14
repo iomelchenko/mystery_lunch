@@ -62,5 +62,8 @@ Rails.application.configure do
   config.download_links = false
   config.webpacker.check_yarn_integrity = false
 
+  #Disable yarn integrity in dev env
+  config.webpacker.check_yarn_integrity = false
+
   Rails.application.routes.default_url_options[:host] = 'localhost:3000'
 end

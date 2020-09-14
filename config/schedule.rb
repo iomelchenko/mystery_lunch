@@ -19,6 +19,12 @@
 
 # Learn more: http://github.com/javan/whenever
 
+ENV.each_key do |key|
+  env key.to_sym, ENV[key]
+end
+
+set :environment, ENV["RAILS_ENV"]
+
 set :output, { error: 'log/cron_error.log', standard: 'log/cron.log' }
 
 every '0 1 1 * *' do
