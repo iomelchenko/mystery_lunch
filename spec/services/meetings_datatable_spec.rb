@@ -37,19 +37,43 @@ describe MeetingsDatatable do
     expect(datatable_json[:iTotalDisplayRecords]).to eql(Allocation.count)
 
     expect(data).to include(
-      ["Mystery pair #{meeting1.id}", "#{Date.current.month}/#{Date.current.year}", user1.name, user1.department.name, avatar_url]
+      [
+        "Mystery pair #{meeting1.id}",
+        "#{Date.current.month}/#{Date.current.year}",
+        user1.name,
+        user1.department.name,
+        avatar_url
+      ]
     )
 
     expect(data).to include(
-      ["Mystery pair #{meeting1.id}", "#{Date.current.month}/#{Date.current.year}", user2.name, user2.department.name, avatar_url]
+      [
+        "Mystery pair #{meeting1.id}",
+        "#{Date.current.month}/#{Date.current.year}",
+        user2.name,
+        user2.department.name,
+        avatar_url
+      ]
     )
 
     expect(data).to include(
-      ["Mystery pair #{meeting2.id}", "#{Date.current.month}/#{Date.current.year}", user3.name, user3.department.name, avatar_url]
+      [
+        "Mystery pair #{meeting2.id}",
+        "#{Date.current.month}/#{Date.current.year}",
+        user3.name,
+        user3.department.name,
+        avatar_url
+      ]
     )
 
     expect(data).to include(
-      ["Mystery pair #{meeting2.id}", "#{Date.current.month}/#{Date.current.year}", user4.name, user4.department.name, avatar_url]
+      [
+        "Mystery pair #{meeting2.id}",
+        "#{Date.current.month}/#{Date.current.year}",
+        user4.name,
+        user4.department.name,
+        avatar_url
+      ]
     )
   end
 end

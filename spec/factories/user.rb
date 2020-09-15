@@ -6,6 +6,6 @@ FactoryBot.define do
     state { :active }
     department { Department.first }
     password { Faker::Internet.password(min_length: 6) }
-    email  { Faker::Internet.email }
+    email { Faker::Internet.email }
   end
 end
