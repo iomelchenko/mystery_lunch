@@ -8,6 +8,6 @@ module UserHelper
   end
 
   def gravatar(user)
-    image_tag("#{::User::GRAVATAR_URL}?gravatar_id=#{Digest::MD5::hexdigest(user.email)}?d=wavatar")
+    image_tag("#{ENV['GRAVATAR_URL']}?gravatar_id=#{Digest::MD5::hexdigest(user.email)}?d=wavatar")
   end
 end
