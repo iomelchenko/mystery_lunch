@@ -13,7 +13,6 @@ RSpec.describe MeetingsController, type: :controller do
   let!(:allocation) { create :allocation, meeting: meeting, user: user }
   let!(:allocation2) { create :allocation, meeting: meeting, user: user1 }
 
-
   describe 'GET #index' do
     it 'assigns allocations' do
       get :index, params: {}

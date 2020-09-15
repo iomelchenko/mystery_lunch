@@ -16,11 +16,11 @@ describe Matcher::AllowedAllocationsBuilder do
   describe '#call' do
     let(:allocations_obj) do
       {
-        user1.id => { :allowed => [user3.id, user4.id, user5.id], :count => 3 },
-        user2.id => { :allowed => [user3.id, user4.id, user5.id], :count => 3 },
-        user3.id => { :allowed => [user1.id, user2.id, user5.id], :count => 3 },
-        user4.id => { :allowed => [user1.id, user2.id, user5.id], :count => 3 },
-        user5.id => { :allowed => [user1.id, user2.id, user3.id, user4.id], :count => 4 }
+        user1.id => { allowed: [user3.id, user4.id, user5.id], count: 3 },
+        user2.id => { allowed: [user3.id, user4.id, user5.id], count: 3 },
+        user3.id => { allowed: [user1.id, user2.id, user5.id], count: 3 },
+        user4.id => { allowed: [user1.id, user2.id, user5.id], count: 3 },
+        user5.id => { allowed: [user1.id, user2.id, user3.id, user4.id], count: 4 }
       }
     end
 
@@ -43,9 +43,9 @@ describe Matcher::AllowedAllocationsBuilder do
   describe '#remove_from_available' do
     let(:allocations_obj) do
       {
-        user2.id => { :allowed => [user4.id, user5.id], :count => 2 },
-        user4.id => { :allowed => [user2.id, user5.id], :count => 2 },
-        user5.id => { :allowed => [user2.id, user4.id], :count => 2 }
+        user2.id => { allowed: [user4.id, user5.id], count: 2 },
+        user4.id => { allowed: [user2.id, user5.id], count: 2 },
+        user5.id => { allowed: [user2.id, user4.id], count: 2 }
       }
     end
 

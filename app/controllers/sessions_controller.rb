@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
 
   def create
     user =
-      User.where(role: :admin).find_by(email: params[:session][:email].downcase)
+      User.find_by(email: params[:session][:email].downcase)
 
     if user&.authenticate(params[:session][:password])
       log_in user
