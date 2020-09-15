@@ -53,7 +53,7 @@ RSpec.describe UsersController, type: :controller do
     end
   end
 
-  describe 'ET #new' do
+  describe 'GET #new' do
     it 'assigns a new user as @user' do
       get :new, params: {}
 
