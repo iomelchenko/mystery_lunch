@@ -1,19 +1,23 @@
 # docker-compose.yml
-version: '3.0'
+version: '3.4'
 services:
   db:
     image: postgres
     volumes:
       - ./tmp/db:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_PASSWORD: mystery_lunch
   web:
-    build: .
-    volumes:
-      - .:/app
-    ports:
-      - "3000:3000"
+    build:
+      context: .
+      dockerfile: Dockerfile
     depends_on:
       - db
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    env_file: .env
     environment:
       PG_PASSWORD: mystery_lunch
