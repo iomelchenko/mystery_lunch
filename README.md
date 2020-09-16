@@ -13,8 +13,7 @@ randomly selected to have lunch with another employee from a different departmen
 * `cd mystery_lunch`
 * `bundle install`
 * `rake db:setup` - creates the database with an initial seeds
-* `rails webpacker:install`  
-  without Overwriting `mystery_lunch/config/webpack/environment.js` !
+* `yarn install`
 * adjust crontab (using whenever gem)
 * `whenever --user your_local_user_name`
 * `whenever --update-crontab --set environment='development'` - make it work on the dev environment
@@ -37,8 +36,9 @@ Tested on Ubuntu 18.04 system local environment
 * clone the app from repository  
   `git clone git@github.com:iomelchenko/mystery_lunch.git`
 * `cd mystery_lunch`
-* run `docker-compose up`
-* run `docker-compose run web rake db:setup`
+* `docker-compose build`
+* `docker-compose run web yarn install`
+* `docker-compose run web rake db:setup`
 * run `docker-compose up`
 
 * open the url - `localhost:3000`
@@ -50,7 +50,7 @@ run in the application folder
 ##  Important considerations
 
 ### Algorithm
-Since identified users allocation as a `P-complete` problem, I'm using a greedy algorithm to achieve the best result for an appropriate time.
+Since identified users allocation as a `NP-complete` problem, I'm using a greedy algorithm to achieve the best result for an appropriate time.
 ### Libraries
 Some solutions were pragmatic (due to the small amount of project functionality).  
 For the production project I'd use:  
