@@ -36,17 +36,17 @@ describe Matcher::ExcludedUsersBuilder do
 
   let(:all_candidates) { User.active.map(&:id) }
 
-    let(:not_allowed_obj) do
-      {
-        user1.id => [user2.id, user3.id, user5.id],
-        user2.id => [user1.id],
-        user3.id => [user1.id, user4.id, user5.id],
-        user4.id => [user3.id],
-        user5.id => [user1.id, user3.id, user6.id, user7.id],
-        user6.id => [user5.id, user7.id],
-        user7.id => [user5.id, user6.id]
-      }
-    end
+  let(:not_allowed_obj) do
+    {
+      user1.id => [user2.id, user3.id, user5.id],
+      user2.id => [user1.id],
+      user3.id => [user1.id, user4.id, user5.id],
+      user4.id => [user3.id],
+      user5.id => [user1.id, user3.id, user6.id, user7.id],
+      user6.id => [user5.id, user7.id],
+      user7.id => [user5.id, user6.id]
+    }
+  end
 
   describe '#call' do
     it 'creates a proper object' do

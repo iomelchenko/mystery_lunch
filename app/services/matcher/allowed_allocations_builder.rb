@@ -63,7 +63,7 @@ module Matcher
           end
 
           matches.uniq!
-          matches = matches - excluded_users_buider.not_allowed_for_allocation[user_id]
+          matches -= excluded_users_buider.not_allowed_for_allocation[user_id]
           next if matches.empty?
 
           hsh[user_id] =

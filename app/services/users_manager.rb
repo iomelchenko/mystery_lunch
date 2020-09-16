@@ -51,7 +51,7 @@ class UsersManager
     allowed_allocations_builder.call(remaining_user_id)
 
     allowed = allowed_allocations_builder
-                .users_for_allocation[remaining_user_id]
+              .users_for_allocation[remaining_user_id]
 
     allowed ? allowed[:allowed] : []
   end
