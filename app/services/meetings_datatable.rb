@@ -58,6 +58,6 @@ class MeetingsDatatable
   end
 
   def gravatar(user)
-    "#{::User::GRAVATAR_URL}?gravatar_id=#{Digest::MD5.hexdigest(user.email)}?d=wavatar"
+    "#{ENV['GRAVATAR_URL']}?gravatar_id=#{Digest::MD5.hexdigest(user.email)}?d=wavatar"
   end
 end

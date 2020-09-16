@@ -70,10 +70,10 @@ module Matcher
       return if !ids.nil? && ids.empty?
 
       allowed = if ids.present?
-                   allowed_allocations_builder.users_for_allocation.select { |k, _v| ids.include?(k) }
-                 else
-                   allowed_allocations_builder.users_for_allocation
-                 end
+                  allowed_allocations_builder.users_for_allocation.select { |k, _v| ids.include?(k) }
+                else
+                  allowed_allocations_builder.users_for_allocation
+                end
 
       return unless allowed.present?
       return [allowed.keys[0], allowed.values[0]] if allowed.count == 1
