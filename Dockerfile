@@ -1,8 +1,6 @@
-FROM ruby:2.7.1
+FROM ruby:2.7.2
 
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-RUN apt-get update -qq && apt-get install -y build-essential nodejs yarn
+RUN apt-get update -qq && apt-get install -y build-essential nodejs yarn imagemagick cron
 
 ENV APP_HOME /app
 RUN mkdir $APP_HOME
@@ -13,6 +11,9 @@ ADD Gemfile* $APP_HOME/
 RUN bundle install
 
 ADD . $APP_HOME
-RUN yarn install --check-files
-CMD bash -c "bundle exec whenever --update-crontab && cron -f"
-CMD ["rails","server","-b","0.0.0.0"]
+
+COPY package.json ./
+COPY yarn.lock ./
+
+ENTRYPOINT bundle exec rake db:setup && \
+           bundle exec rails s -b 0.0.0.0

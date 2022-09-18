@@ -9,6 +9,7 @@ services:
     environment:
       POSTGRES_PASSWORD: mystery_lunch
   web:
+    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile
