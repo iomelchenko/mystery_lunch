@@ -1,5 +1,14 @@
-Mystery Lunch application - at the beginning of each month every employee is  
-randomly selected to have lunch with another employee from a different department.
+Mystery lunch app designed to make easier to
+meet and connect people from a different departments.
+
+At the beginning of each month, every employee is randomly selected to have lunch with another employee of a different department.
+
+Departments: operations, sales, marketing, risk, management, finance, HR, development, data
+
+Two people can not be matched in case they are already had a lunch within last three months.  
+In case of amount of employees odd, one of the matches should contain three members.  
+In case of adding a new employee during the current month, he should be added to the existing pair.  
+When employee was resigned and deleted, the remaining one need to be added to the existing pair.
 
 ## System dependencies
 * Ruby version - 2.7.1
@@ -7,7 +16,7 @@ randomly selected to have lunch with another employee from a different departmen
 * Docker (in case you want to setup application in the virtual container)
 
 ## Application setup
-* ### Local setup without Docker
+* ### Local setup
 * clone the app from repository  
 `git clone git@github.com:iomelchenko/mystery_lunch.git`
 * `cd mystery_lunch`
@@ -32,13 +41,11 @@ log/cron_error.log
 this user has an admin role, without this role you can't access `users` resources  
 
 * ### Local setup with Docker  
-Tested on Ubuntu 18.04 system local environment  
+Tested on macOS Monrerey system local environment
 * clone the app from repository  
   `git clone git@github.com:iomelchenko/mystery_lunch.git`
 * `cd mystery_lunch`
 * `docker-compose build`
-* `docker-compose run web yarn install`
-* `docker-compose run web rake db:setup`
 * run `docker-compose up`
 
 * open the url - `localhost:3000`
@@ -61,8 +68,5 @@ For the production project I'd use:
 * Vue.js framework with grid instead of JQuery Datatables
 
 ### TODO
-* implement PG full text search for search by user_name/department  
+implement PG full text search for search by user_name/department  
 (since sql filter `user.name ILIKE :search OR department.name ILIKE :search` can be slow on some amount of data);
-* use `I18n` for translations in the codebase;
-
-Thank you for reading this file to the end :)
