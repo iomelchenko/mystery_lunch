@@ -1,5 +1,27 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: users
+#
+#  id              :bigint           not null, primary key
+#  email           :string           not null
+#  name            :string           not null
+#  password_digest :string           not null
+#  role            :integer          default("user"), not null
+#  state           :integer          default("active"), not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  department_id   :bigint
+#
+# Indexes
+#
+#  index_users_on_department_id  (department_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (department_id => departments.id)
+#
 require 'rails_helper'
 
 RSpec.describe User, type: :model do

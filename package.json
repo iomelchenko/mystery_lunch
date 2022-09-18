@@ -2,17 +2,18 @@
   "name": "mystery_lunch",
   "private": true,
   "dependencies": {
-    "@rails/actioncable": "^6.0.0",
-    "@rails/activestorage": "^6.0.0",
-    "@rails/ujs": "^6.0.0",
-    "@rails/webpacker": "4.3.0",
-    "bootstrap": "^4.5.2",
-    "datatables.net-bs4": "^1.10.21",
-    "jquery": "^3.5.1",
+    "@rails/actioncable": "^7.0.4",
+    "@rails/activestorage": "^7.0.4",
+    "@rails/ujs": "^7.0.4",
+    "@rails/webpacker": "5.4.3",
+    "bootstrap": "^5.2.1",
+    "datatables.net-bs4": "^1.12.1",
+    "jquery": "^3.6.1",
+    "sass": "^1.54.9",
     "turbolinks": "^5.2.0"
   },
   "version": "0.1.0",
   "devDependencies": {
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^4.11.0"
   }
 }
